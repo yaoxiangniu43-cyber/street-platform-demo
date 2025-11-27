@@ -1,22 +1,152 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>街铺地图平台</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<title>街铺地图 + 的士速递 + 快递柜 平台（静态演示版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f6fa;
+}
+
+/* 顶部导航 */
+.header{
+    background: #ffffff;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #e6e6e6;
+}
+.logo{
+    width: 42px;
+    height: 42px;
+    background: #00aaff;
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+.title{
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* 内容容器 */
+.container{
+    max-width: 1080px;
+    margin: 20px auto;
+    padding: 0 12px;
+}
+
+/* 卡片 */
+.card{
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 地图占位 */
+.map{
+    width: 100%;
+    height: 320px;
+    border: 2px dashed #88c7ff;
+    border-radius: 12px;
+    background: #eaf6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007acc;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 子标题 */
+.section-title{
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* 列表 */
+.item{
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+.item:last-child{
+    border: none;
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>街铺地图 + 的士速递 + 快递柜闭环平台</h1>
-  </header>
-  <main>
-    <div id="map"></div>
-    <div id="services">
-      <button onclick="showTaxi()">的士速递</button>
-      <button onclick="showLocker()">快递柜</button>
+
+<!-- 顶部导航 -->
+<div class="header">
+    <div class="logo">街</div>
+    <div class="title">街铺地图 + 的士速递 + 快递柜（静态演示版）</div>
+</div>
+
+<div class="container">
+
+    <!-- 模块说明 -->
+    <div class="card">
+        <div class="section-title">📌 说明</div>
+        <p>此页面为 <strong>静态演示版</strong>，用于展示未来平台的界面设计结构。</p>
+        <p>可直接用于：</p>
+        <ul>
+            <li>✔ GitHub Pages（在线 Demo）</li>
+            <li>✔ WeChat 小程序前期原型设计</li>
+            <li>✔ 投资人 / 团队可视化演示</li>
+        </ul>
+        <p>若需要我能升级为：动态交互 + 地图 API + 后端对接版。</p>
     </div>
-  </main>
-  <script src="map.js"></script>
-  <script src="services.js"></script>
+
+    <!-- 地图区 -->
+    <div class="card">
+        <div class="section-title">🗺 街铺地图（示意）</div>
+        <div class="map">MAP 地图占位（静态演示）</div>
+    </div>
+
+    <!-- 运营模块展示 -->
+    <div class="card">
+        <div class="section-title">🚕 的士速递（司机端/运营示意）</div>
+        <div class="item">● 司机接单模拟界面（静态占位）</div>
+        <div class="item">● 附近 500m 呼叫展示</div>
+        <div class="item">● 订单流转：待接 → 已接 → 已完成</div>
+        <div class="item">● 收益统计（示意）</div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📦 快递柜（示意）</div>
+        <div class="item">● 快递柜分布展示（静态）</div>
+        <div class="item">● 各街铺柜体容量、状态</div>
+        <div class="item">● 临期预警、爆仓提醒</div>
+    </div>
+
+    <!-- 平台闭环展示 -->
+    <div class="card">
+        <div class="section-title">🔄 平台闭环模型</div>
+        <div class="item">街铺地图 → 司机/柜体实时分布可视化</div>
+        <div class="item">的士速递 → 街区即时配送与调度</div>
+        <div class="item">快递柜 → 收寄件枢纽</div>
+        <div class="item"><strong>三者构成一个自循环的城市微物流网络</strong></div>
+    </div>
+
+    <!-- 结尾提示 -->
+    <div class="card">
+        <strong>💡 提示：</strong><br>
+        你可将此文件直接压缩为 ZIP，并上传 GitHub Pages 获得真实在线演示链接。
+    </div>
+
+</div>
+
 </body>
 </html>

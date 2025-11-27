@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>街铺地图 · 的士速递 · 快递柜 - Demo</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f5f6fa}
+  .top{display:flex;align-items:center;padding:12px;background:#fff;border-bottom:1px solid #eee}
+  .logo{width:44px;height:44px;background:#00aaff;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .wrap{display:flex;gap:12px;padding:12px}
+  #map{flex:1;min-height:720px;border-radius:8px;overflow:hidden}
+  .panel{width:380px;background:#fff;border-radius:8px;padding:12px;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+  .btn{display:inline-block;padding:8px 12px;background:#00aaff;color:#fff;border-radius:8px;text-decoration:none}
+  .list-item{padding:8px;border-bottom:1px dashed #eee}
+  h4{margin:0 0 8px 0}
+</style>
+<!-- 替换下面的 KEY 为你在高德开放平台申请到的 JSAPI Key -->
+<script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY"></script>
+</head>
+<body>
+  <div class="top"><div class="logo">街</div><h3 style="margin:0 12px">街铺地图 · 的士速递 · 快递柜 Demo</h3></div>
+  <div class="wrap">
+    <div id="map"></div>
+    <div class="panel">
+      <h4>控制面板</h4>
+      <p><a class="btn" href="#" onclick="simulateOrder()">模拟：街铺取件并派单</a></p>
+      <div id="shops"><h5>街铺（示例）</h5></div>
+      <div id="drivers"><h5>司机（示例）</h5></div>
+      <div id="lockers"><h5>快递柜（示例）</h5></div>
+      <hr />
+      <div id="events"><h5>事件流</h5></div>
+    </div>
+  </div>
+
+<script>
+/* 示例数据（上线时由后端 API 提供） */
+let shops = [
+  {id:'S1',name:'便利店A',lng:113.629,lat:34.747},
+  {id:'S2',name:'药房B',lng:113.618,lat:34.751},
+  {id:'S3',name:'生鲜C',lng:113.635,lat:34.752}
+];
+let drivers = [
+  {id:'D1',name:'司机1',lng:113.628,lat:34.749,status:'idle'},
+  {id:'D2',name:'司机2',lng:113.632,lat:34.748,status:'busy'},
+  {id:'D3',name:'司机3',lng:113.633,lat:34.750,status:'idle'}
+];
+let lockers = [
+  {id:'L1',shopId:'S1',lng:113.630,lat:34.746,slots:12,status:'free'},
+  {id:'L2',shopId:'S2',lng:113.617,lat:34.752,slots:4,status:'occupied'}
+];
+
+let map, shopMarkers=[], driverMarkers=[], lockerMarkers=[];
+
+/* 初始化地图 */
+function initMap(){
+  map = new AMap.Map('map', {
+    center: [113.629,34.749],
+    zoom: 15,
+    pitch: 0
+  });
+  renderAll();
+}
+
+/* 渲染 */
+function renderAll(){
+  renderShops(); renderDrivers(); renderLockers(); renderPanel();
+}
+
+function renderShops(){
+  shopMarkers.forEach(m=>m.setMap(null)); shopMarkers=[];
+  shops.forEach(s=>{
+    const marker = new AMap.Marker({
+      position: [s.lng, s.lat],
+      title: s.name,
+      anchor: 'center'
+    });
+    marker.on('click', ()=>{ addEvent('点击街铺：'+s.name); map.panTo([s.lng,s.lat]); });
+    marker.setMap(map);
+    shopMarkers.push(marker);
+  });
+}
+
+function renderDrivers(){
+  driverMarkers.forEach(m=>m.setMap(null)); driverMarkers=[];
+  drivers.forEach(d=>{
+    const icon = d.status === 'idle' ? createSvgIcon('#0f0') : createSvgIcon('#ff6a00');
+    const marker = new AMap.Marker({ position:[d.lng,d.lat], title:d.name, content: icon });
+    marker.on('click', ()=>addEvent('点击司机：' + d.name));
+    marker.setMap(map);
+    driverMarkers.push(marker);
+  });
+}
+
+function renderLockers(){
+  lockerMarkers.forEach(m=>m.setMap(null)); lockerMarkers=[];
+  lockers.forEach(l=>{
+    const marker = new AMap.Marker({
+      position:[l.lng,l.lat],
+      title:'柜:'+l.id,
+      content: createLockerIcon(l.status)
+    });
+    marker.on('click', ()=>addEvent('点击快递柜：' + l.id));
+    marker.setMap(map);
+    lockerMarkers.push(marker);
+  });
+}
+
+/* 简易图标 */
+function createSvgIcon(color){
+  return `<div style="width:28px;height:28px;border-radius:14px;background:${color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">✕</div>`;
+}
+function createLockerIcon(status){
+  const bg = status === 'free' ? '#00aaff' : '#ff6a00';
+  return `<div style="padding:6px;border-radius:6px;background:${bg};color:#fff;font-size:12px">柜</div>`;
+}
+
+function renderPanel(){
+  document.getElementById('shops').innerHTML = '<h5>街铺（示例）</h5>' + shops.map(s=>`<div class="list-item">${s.name} (${s.lng.toFixed(3)},${s.lat.toFixed(3)})</div>`).join('');
+  document.getElementById('drivers').innerHTML = '<h5>司机（示例）</h5>' + drivers.map(d=>`<div class="list-item">${d.name} - ${d.status}</div>`).join('');
+  document.getElementById('lockers').innerHTML = '<h5>快递柜（示例）</h5>' + lockers.map(l=>`<div class="list-item">柜:${l.id} (${l.status}) - 槽:${l.slots}</div>`).join('');
+}
+
+function addEvent(txt){
+  const el = document.getElementById('events');
+  el.innerHTML = `<div style="padding:8px;border-bottom:1px solid #eee">${new Date().toLocaleTimeString()} - ${txt}</div>` + el.innerHTML;
+}
+
+/* 模拟派单逻辑 */
+function simulateOrder(){
+  addEvent('创建订单：从 ' + shops[0].name);
+  const idleDrivers = drivers.filter(d=>d.status === 'idle');
+  if(!idleDrivers.length){ addEvent('无空闲司机，改派快递员'); alert('当前无空闲司机'); return; }
+  idleDrivers.sort((a,b)=>((a.lng-shops[0].lng)**2 + (a.lat-shops[0].lat)**2) - ((b.lng-shops[0].lng)**2 + (b.lat-shops[0].lat)**2));
+  const driver = idleDrivers[0];
+  driver.status = 'busy';
+  renderDrivers(); renderPanel(); addEvent('司机 ' + driver.name + ' 接单');
+  setTimeout(()=>{
+    const avail = lockers.find(l=>l.status === 'free');
+    if(avail){ avail.status = 'occupied'; addEvent('已放入快递柜 ' + avail.id); renderLockers(); renderPanel(); }
+    else { addEvent('未找到空闲快递柜，司机完成末端投递'); }
+    driver.status = 'idle'; renderDrivers(); renderPanel();
+  }, 1800);
+}
+
+/* init */
+initMap();
+</script>
+</body>
+</html>
